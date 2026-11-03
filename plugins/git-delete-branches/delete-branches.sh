@@ -17,23 +17,7 @@
 #   PROTECTED_BRANCHES="main develop staging release" ./delete-branches.sh
 #
 # Cài đặt vào oh-my-zsh (dùng lệnh `gdelbr` ở mọi repo):
-#   1. Tạo custom plugin:
-#        PLUGIN_DIR=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/git-delete-branches
-#        mkdir -p "$PLUGIN_DIR"
-#        cp delete-branches.sh "$PLUGIN_DIR/" && chmod +x "$PLUGIN_DIR/delete-branches.sh"
-#        echo 'alias gdelbr="${0:A:h}/delete-branches.sh"' > "$PLUGIN_DIR/git-delete-branches.plugin.zsh"
-#      (Dùng `ln -sf "$PWD/delete-branches.sh" "$PLUGIN_DIR/"` thay cho `cp` nếu muốn
-#       alias luôn chạy bản mới nhất của file này.)
-#   2. Bật plugin trong ~/.zshrc:
-#        plugins=(git git-delete-branches)
-#   3. Nạp lại shell:
-#        exec zsh
-#   4. Dùng thử:
-#        gdelbr -n
-#
-# Lưu ý WSL: nếu gặp lỗi "compinit: no such file or directory: .../_docker" thì
-# Docker Desktop đang tắt khiến symlink completion bị gãy. Mở Docker Desktop, hoặc:
-#   sudo rm /usr/share/zsh/vendor-completions/_docker && rm -f ~/.zcompdump* && exec zsh
+#   Chạy ./install.sh ở thư mục gốc của repo, rồi `exec zsh`.
 
 set -euo pipefail
 
@@ -138,7 +122,8 @@ fi
 failed=0
 delete_flag=$($FORCE && echo "-D" || echo "-d")
 
-for branch in "${local_targets[@]}"; do
+# ${arr[@]+"${arr[@]}"}: tránh lỗi "unbound variable" với mảng rỗng trên bash 3.2 (macOS)
+for branch in ${local_targets[@]+"${local_targets[@]}"}; do
   if git branch "$delete_flag" "$branch" >/dev/null 2>&1; then
     echo "✔ Đã xóa local: $branch"
   else
@@ -147,7 +132,7 @@ for branch in "${local_targets[@]}"; do
   fi
 done
 
-for branch in "${remote_targets[@]}"; do
+for branch in ${remote_targets[@]+"${remote_targets[@]}"}; do
   if git push "$REMOTE_NAME" --delete "$branch" >/dev/null 2>&1; then
     echo "✔ Đã xóa remote: $REMOTE_NAME/$branch"
   else
