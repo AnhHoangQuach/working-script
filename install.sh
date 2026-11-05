@@ -131,4 +131,4 @@ fi
 
 echo
 echo "Hoàn tất: ${installed[*]}"
-echo "Chạy 'exec zsh' để nạp lại shell."
+echo "Chạy 'exec zsh' để nạp lại shell, rồi 'ws-help' để xem các command đang có."
